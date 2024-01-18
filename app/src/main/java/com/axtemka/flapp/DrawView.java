@@ -15,6 +15,8 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 
     private DrawThread drawThread;
 
+    public int kTapLose = 0;
+
     private int score = 0;
     public DrawView(Context context) {
         super(context);
@@ -45,9 +47,16 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (DrawThread.youLose){
+            ++kTapLose;
+            if (kTapLose > 1) {
+                DrawThread.youLose = false;
+            }
+        }
+        else{
+            drawThread.changeBirdY();
+        }
 
-
-        drawThread.changeBirdY();
         return false;
     }
 

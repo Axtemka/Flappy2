@@ -11,8 +11,8 @@ import android.view.SurfaceHolder;
 
 public class DrawThread extends Thread {
 
-    private double gravity =  0.2;
-    private boolean youLose = false;
+    private double gravity =  0.5;
+    static public boolean youLose = false;
     public int score = 0;
 
     private SurfaceHolder surfaceHolder;
@@ -32,15 +32,15 @@ public class DrawThread extends Thread {
 
         Bitmap b = BitmapFactory.decodeResource(context.getResources(), R.drawable.birdup);
         Rect firstFrame = new Rect(0, 0, b.getWidth(), b.getHeight());
-        player = new Sprite(20, 0, 0, 10, firstFrame, b, 0.5);
+        player = new Sprite(20, 50, 0, 10, firstFrame, b, gravity);
 
         b = BitmapFactory.decodeResource(context.getResources(), R.drawable.toweruup);
         firstFrame = new Rect(0, 0, b.getWidth(), b.getHeight());
-        pipeUp = new Sprite(20, 0, -5, 0, firstFrame, b, 0);
+        pipeUp = new Sprite(800, -1400, -5, 0, firstFrame, b, 0);
 
         b = BitmapFactory.decodeResource(context.getResources(), R.drawable.towerddown);
         firstFrame = new Rect(0, 0, b.getWidth(), b.getHeight());
-        pipeDown = new Sprite(20, 0, -5, 0, firstFrame, b, 0);
+        pipeDown = new Sprite(500, 900, -5, 0, firstFrame, b, 0);
 
         this.surfaceHolder = surfaceHolder;
     }
@@ -64,7 +64,9 @@ public class DrawThread extends Thread {
                         p.setColor(Color.WHITE);
                         String txt = "Вы набрали\n" + Integer.toString(score) + " очков";
                         canvas.drawText( txt, canvas.getWidth() - 820, canvas.getHeight() - 1300, p);
-                        canvas.drawText("Click to play this game", canvas.getWidth() - 820, canvas.getHeight() - 600, p);}
+                        canvas.drawText("Click to play this game", canvas.getWidth() - 820, canvas.getHeight() - 600, p);
+
+                    }
                     else{
                         canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backgroundPaint);
                         canvas.drawBitmap(player.bitmap, (float) player.getX(), (float) player.getY(), backgroundPaint);
@@ -73,6 +75,7 @@ public class DrawThread extends Thread {
                         drawScore(canvas);
                         updatePositions(canvas);
                     }
+                    deathCheck(canvas);
                 } finally {
                     surfaceHolder.unlockCanvasAndPost(canvas);
                 }
@@ -83,21 +86,41 @@ public class DrawThread extends Thread {
         player.update();
         pipeUp.update();
         pipeDown.update();
-
         if (pipeDown.getX() < -pipeDown.getFrameWidth()) {
             teleportEnemy(canvas);
             Score();
-        }
-        if (pipeDown.intersect(player)) {
-            youLose = true;
         }
         if (pipeUp.getX() < -pipeUp.getFrameWidth()) {
             teleportEnemy(canvas);
         }
         if (pipeUp.intersect(player)) {
+            player.setY(50);
+            youLose = true;
+            teleportEnemy(canvas);
+        }
+        if (pipeDown.intersect(player)) {
+            player.setY(50);
+            youLose = true;
+            teleportEnemy(canvas);
+        }
+    }
+    public void deathCheck(Canvas canvas){
+        if (player.getY() <= 0){
+            player.setY(50);
             youLose = true;
         }
-
+        if (player.getY() >= canvas.getHeight()){
+            player.setY(50);
+            youLose = true;
+        }
+        if (pipeUp.intersect(player)) {
+            player.setY(50);
+            youLose = true;
+        }
+        if (pipeDown.intersect(player)) {
+            player.setY(50);
+            youLose = true;
+        }
     }
 
     public void changeBirdY(){
